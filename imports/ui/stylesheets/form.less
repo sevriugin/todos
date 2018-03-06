@@ -117,3 +117,41 @@ input:-webkit-autofill {
     width: 1em;
   }
 }
+
+.input-symbols {
+  display: inline-block;
+  position: relative;
+
+  &.error [class^="icon-"],
+  &.error [class*=" icon-"] {
+    color: @color-negative;
+  }
+
+  input { padding-left: 3em; }
+
+  // Styling
+  input {
+    width: 100%;
+    padding-top: 28em;
+
+    &:focus {
+      & + [class^="icon-"],
+      & + [class*=" icon-"] {
+        color: @color-primary;
+      }
+    }
+  }
+
+  [class^="icon-"],
+  [class*=" icon-"] {
+    transition: all 300ms ease-in;
+    transform: translate3d(0,-50%,0);
+    background: transparent;
+    color: @color-medium;
+    font-size: 1em;
+    height: 1em;
+    position: absolute;
+    left: 1em;
+    width: 1em;
+  }
+}

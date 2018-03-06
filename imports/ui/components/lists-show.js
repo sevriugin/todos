@@ -14,19 +14,31 @@ import './lists-show.html';
 
 // Component used in the template
 import './todos-item.js';
+import './token-item.js';
 
 import {
   updateName,
   makePublic,
   makePrivate,
   remove,
+  updateContract,
 } from '../../api/lists/methods.js';
 
 import {
   insert,
 } from '../../api/todos/methods.js';
 
+import {
+  cryptocaseStatus,
+} from '../../api/instances/methods.js';
+
 import { displayError } from '../lib/errors.js';
+
+import {
+  smartcontract,
+  getAccounts,
+  getBalance,
+} from '../../ethereum/ethereum-contracts.js';
 
 Template.Lists_show.onCreated(function listShowOnCreated() {
   this.autorun(() => {
@@ -41,6 +53,7 @@ Template.Lists_show.onCreated(function listShowOnCreated() {
   this.state.setDefault({
     editing: false,
     editingTodo: false,
+    editingToken: false,
   });
 
   this.saveList = () => {
@@ -62,7 +75,7 @@ Template.Lists_show.onCreated(function listShowOnCreated() {
     Tracker.flush();
     // We need to wait for the fade in animation to complete to reliably focus the input
     Meteor.setTimeout(() => {
-      this.$('.js-edit-form input[type=text]').focus();
+      this.$('.js-edit-form input[name=desc]').focus();
     }, 400);
   };
 
@@ -101,7 +114,36 @@ Template.Lists_show.helpers({
       onEditingChange(editing) {
         instance.state.set('editingTodo', editing ? todo._id : false);
       },
+      onEditingToken(editing) {
+        instance.state.set('editingToken', editing ? todo._id : false);
+      },
     };
+  },
+  isEditingTodo(todo) {
+    const instance = Template.instance();
+    return instance.state.equals('editingToken', todo._id);
+  },
+  isEditing() {
+    const instance = Template.instance();
+    return instance.state.get('editingToken');
+  },
+  iconClass(value) {
+    if (value) {
+      return 'icon-close';
+    }
+    return 'icon-add';
+  },
+  newTop(top) {
+    const instance = Template.instance();
+    if (instance.state.get('editing')) {
+      return `top: ${top + 12}em`;
+    }
+    return `top: ${top}em`;
+  },
+  contract() {
+    const instance = Template.instance();
+    const list = instance.data.list();
+    return list.contract();
   },
   editing() {
     const instance = Template.instance();
@@ -125,6 +167,9 @@ Template.Lists_show.events({
   'blur input[type=text]'(event, instance) {
     // if we are still editing (we haven't just clicked the cancel button)
     if (instance.state.get('editing')) {
+      if ($(event.target).hasClass('js-contract-edit') || $(event.target).next().hasClass('js-contract-edit')) {
+        return;
+      }
       instance.saveList();
     }
   },
@@ -138,6 +183,9 @@ Template.Lists_show.events({
   // on iOS, we still require the click event so handle both
   'mousedown .js-cancel, click .js-cancel'(event, instance) {
     event.preventDefault();
+    if ($(event.target).hasClass('js-contract-edit') || $(event.target).next().hasClass('js-contract-edit')) {
+      return;
+    }
     instance.state.set('editing', false);
   },
 
@@ -169,6 +217,66 @@ Template.Lists_show.events({
 
   'click .js-todo-add'(event, instance) {
     instance.$('.js-todo-new input').focus();
+  },
+
+  'click .js-contract-edit'(event, instance) {
+    const $input = $(event.target).prev();
+    const $icon = $(event.target);
+    if ($icon.hasClass('icon-close')) {
+      $input.val('');
+      $icon.removeClass('icon-close');
+      $icon.addClass('icon-add');
+    } else if ($icon.hasClass('icon-cog')) {
+      const method = $input.attr('id');
+      if (method === 'status') {
+        const list = instance.data.list();
+        smartcontract(list.contract())
+          .then((sc) => {
+            sc.state.call()
+          .then((state) => {
+            console.log(`Status is ----> ${state}`);
+            $input.val(`Status is ${state}`);
+
+            cryptocaseStatus.call({
+              instanceId: list.contractInstance(),
+            }, displayError);
+            getAccounts()
+              .then((accounts) => {
+                console.log(`account --->${accounts[0]}`);
+                getBalance(accounts[0]).then((balance) => { console.log(`balance --->${balance}`); });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          });
+          }).catch((error) => {
+            console.log(error.message);
+          });
+      }
+    } else {
+      $input.focus();
+    }
+  },
+
+  'mousedown .js-sync, click .js-sync'(event, instance) {
+    event.preventDefault();
+
+    const contract = $('#contract').val().trim();
+    const description = $('#description').val().trim();
+    const start = $('#start').val().trim();
+    const end = $('#end').val().trim();
+    const term = $('#term').val().trim();
+
+    let update = {listId: this.list()._id};
+
+    if (contract) { update.smartcontract = contract; }
+    if (description) { update.description = description; }
+    if (start) { update.startPrice = parseInt(start); }
+    if (end) { update.endPrice = parseInt(end); }
+    if (term) { update.terms = parseInt(term); }
+    updateContract.call(update);
+
+    instance.state.set('editing', false);
   },
 
   'submit .js-todo-new'(event) {

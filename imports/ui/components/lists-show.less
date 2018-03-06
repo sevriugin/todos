@@ -3,7 +3,7 @@
 .page.lists-show {
   .content-scrollable {
     background: @color-empty;
-    top: 5em !important;
+    top: 5em;
   }
 
   // Custom nav for lists-show
@@ -57,6 +57,31 @@
         padding-top: .25em;
       }
     }
+
+    form.contract-new {
+      .position(absolute, 3em, 0, auto, 0);
+
+      input[type="text"] {
+        background: transparent;
+        padding-bottom: .25em;
+        padding-left: 44px !important;
+        padding-top: .25em;
+      }
+    }
+
+    form.token-new {
+
+      position: absolute;
+      top: 3em;
+      
+      input[type="text"] {
+        background: transparent;
+        padding-bottom: .25em;
+        padding-left: 44px !important;
+        padding-top: .25em;
+      }
+    }
+    
     form.list-edit-form {
       position: relative;
 

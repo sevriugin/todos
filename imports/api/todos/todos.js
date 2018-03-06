@@ -5,6 +5,7 @@ import faker from 'faker';
 import incompleteCountDenormalizer from './incompleteCountDenormalizer.js';
 
 import { Lists } from '../lists/lists.js';
+import { Contracts } from '../contracts/contracts.js';
 
 class TodosCollection extends Mongo.Collection {
   insert(doc, callback) {
@@ -59,6 +60,15 @@ Todos.schema = new SimpleSchema({
     type: Boolean,
     defaultValue: false,
   },
+  smartcontract: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    optional: true,
+  },
+  balance: {
+    type: Number,
+    optional: true,
+  },
 });
 
 Todos.attachSchema(Todos.schema);
@@ -71,6 +81,8 @@ Todos.publicFields = {
   text: 1,
   createdAt: 1,
   checked: 1,
+  smartcontract: 1,
+  balance: 1,
 };
 
 // TODO This factory has a name - do we have a code style for this?
@@ -88,5 +100,14 @@ Todos.helpers({
   },
   editableBy(userId) {
     return this.list().editableBy(userId);
+  },
+  contract() {
+    if (this.smartcontract) {
+      return Contracts.findOne(this.smartcontract).name;
+    }
+    return null;
+  },
+  getContract(name) {
+    return Contracts.findOne({ name: name });
   },
 });

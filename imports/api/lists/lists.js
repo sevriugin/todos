@@ -4,6 +4,9 @@ import { Factory } from 'meteor/dburles:factory';
 import { TAPi18n } from 'meteor/tap:i18n';
 
 import { Todos } from '../todos/todos.js';
+import { Contracts } from '../contracts/contracts.js';
+import { Instances } from '../instances/instances.js';
+import { logger } from '../../utils/logger.js';
 
 class ListsCollection extends Mongo.Collection {
   insert(list, callback, language = 'en') {
@@ -42,6 +45,11 @@ Lists.schema = new SimpleSchema({
   name: { type: String },
   incompleteCount: { type: Number, defaultValue: 0 },
   userId: { type: String, regEx: SimpleSchema.RegEx.Id, optional: true },
+  smartcontract: { type: String, regEx: SimpleSchema.RegEx.Id, optional: true },
+  description: { type: String, optional: true },
+  startPrice: { type: Number, optional: true },
+  endPrice: { type: Number, optional: true },
+  terms: { type: Number, optional: true },
 });
 
 Lists.attachSchema(Lists.schema);
@@ -53,6 +61,11 @@ Lists.publicFields = {
   name: 1,
   incompleteCount: 1,
   userId: 1,
+  smartcontract: 1,
+  description: 1,
+  startPrice: 1,
+  endPrice: 1,
+  terms: 1,
 };
 
 Factory.define('list', Lists, {});
@@ -75,5 +88,18 @@ Lists.helpers({
   },
   todos() {
     return Todos.find({ listId: this._id }, { sort: { createdAt: -1 } });
+  },
+  contract() {
+    if (this.smartcontract) {
+      return Contracts.findOne(this.smartcontract).name;
+    }
+    return null;
+  },
+  contractInstance() {
+    const instance = Instances.findOne({ contract : this.smartcontract });
+    return instance._id;
+  },
+  getContract(name) {
+    return Contracts.findOne({ name: name });
   },
 });

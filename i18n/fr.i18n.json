@@ -29,10 +29,17 @@
       "typeToAdd": "Tapez pour ajouter de nouvelles tâches",
       "noTasks": "Aucune tâche ici",
       "addAbove": "Ajouter de nouvelles tâches ci-dessus",
-      "loading": "Chargement sauvé tâches..."
+      "loading": "Chargement sauvé tâches...",
+      "edit": "Edit",
+      "addContract":"Smart contract",
+      "caseDescription":"Description",
+      "startPrice":"Start price",
+      "endPrice":"End price",
+      "saleTerm":"Terms",
+      "status":"Status"
     },
     "insert": {
-      "list": "Liste"
+      "list": "Case"
     }
   },
   "todos": {

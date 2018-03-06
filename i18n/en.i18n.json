@@ -26,13 +26,26 @@
       "makeListPublic": "Make list public",
       "makeListPrivate": "Make list private",
       "deleteList": "Delete list",
-      "typeToAdd": "Type to add new tasks",
+      "typeToAdd": "Type to add new token",
       "noTasks": "No tasks here",
       "addAbove": "Add new tasks using the field above",
-      "loading": "Loading tasks..."
+      "loading": "Loading tasks...",
+      "edit": "Edit",
+      "addContract":"Smart Contract",
+      "caseDescription":"Description",
+      "startPrice":"Start price",
+      "endPrice":"End price",
+      "saleTerm":"Terms",
+      "status":"Status"
     },
     "insert": {
-      "list": "List"
+      "list": "Case"
+    }
+  },
+  "token": {
+    "show": {
+      "smartcontract":"Enter token smart contract",
+      "balance":"Number of tokens"
     }
   },
   "todos": {
@@ -62,8 +75,8 @@
       "logout": "Logout",
       "login": "Sign In",
       "join": "Join",
-      "newList": "New List",
-      "newListError": "Could not create list.",
+      "newList": "New cryptocase",
+      "newListError": "Could not create cryptocase.",
       "tryingToConnect": "Trying to connect",
       "connectionIssue": "There seems to be a connection issue"
     }

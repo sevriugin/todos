@@ -5,6 +5,7 @@ import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { _ } from 'meteor/underscore';
 
 import { Lists } from './lists.js';
+import { Contracts } from '../contracts/contracts.js';
 
 const LIST_ID_ONLY = new SimpleSchema({
   listId: Lists.simpleSchema().schema('_id'),
@@ -91,6 +92,53 @@ export const updateName = new ValidatedMethod({
   },
 });
 
+export const updateContract = new ValidatedMethod({
+  name: 'lists.updateContract',
+  validate: new SimpleSchema({
+    listId: Lists.simpleSchema().schema('_id'),
+    smartcontract: { type: String, optional: true },
+    description: Lists.simpleSchema().schema('description'),
+    startPrice: Lists.simpleSchema().schema('startPrice'),
+    endPrice: Lists.simpleSchema().schema('endPrice'),
+    terms: Lists.simpleSchema().schema('terms'),
+  }).validator({ clean: true, filter: false }),
+  run({ listId, smartcontract, description, startPrice, endPrice, terms }) {
+    const list = Lists.findOne(listId);
+
+    if (!list.editableBy(this.userId)) {
+      throw new Meteor.Error('lists.remove.accessDenied',
+        'You don\'t have permission to remove this list.');
+    }
+
+    const unset = {};
+    const set = {};
+    const sc = Contracts.findOne({ name: smartcontract });
+
+    if (!sc && smartcontract) {
+      throw new Meteor.Error('todos.updateText.accessDenied',
+        `Cannot find contract name: ${smartcontract}`);
+    }
+
+    if (!smartcontract) { unset.smartcontract = ''; } else { set.smartcontract = sc._id; }
+    if (!description) { unset.description = ''; } else { set.description = description; }
+    if (!startPrice || !endPrice || !terms) {
+      unset.startPrice = '';
+      unset.endPrice = '';
+      unset.terms = '';
+    }
+    else {
+      set.startPrice = startPrice;
+      set.endPrice = endPrice;
+      set.terms = terms;
+    }
+
+    Lists.update(listId, {
+      $set: set,
+      $unset: unset,
+    });
+  },
+});
+
 export const remove = new ValidatedMethod({
   name: 'lists.remove',
   validate: LIST_ID_ONLY,
@@ -121,6 +169,7 @@ const LISTS_METHODS = _.pluck([
   makePrivate,
   updateName,
   remove,
+  updateContract,
 ], 'name');
 
 if (Meteor.isServer) {

@@ -1,0 +1,34 @@
+<template name="Token_item">
+  <nav class="js-title-nav">
+    <form class="js-edit-token-form list-edit-form">
+      <input type="text" name="text" value="{{text}}" placeholder="{{todo.text}}" id="text">
+        <div class="nav-group right">
+          <a href="#" class="js-sync-token nav-item">
+            <span
+              class="icon-sync js-sync-token"
+              title={{_ 'lists.show.sync'}}>
+            </span>
+          </a>
+          <a href="#" class="js-cancel-token nav-item">
+            <span
+              class="icon-close js-cancel"
+              title={{_ 'lists.show.cancel'}}>
+            </span>
+          </a>
+        </div>
+    </form>
+  </nav>
+      
+  <form class="js-token-edit-form token-new input-symbols">
+    <input
+      type="text" name="contract" id="contract" value="{{todo.contract todo}}" style="padding-top: 8em;"
+      placeholder={{_ 'token.show.smartcontract'}}
+    />
+    <span class="{{iconClass todo.smartcontract}} js-token-edit" style="top: 124px;"></span>
+    <input
+      type="text" name="contract" id="balance" value="{{todo.balance}}" style="padding-top: 0em;"
+      placeholder={{_ 'token.show.balance'}}
+    />
+    <span class="{{iconClass todo.balance}} js-token-edit" style="top: 160px;"></span>
+  </form>
+</template>

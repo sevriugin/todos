@@ -15,6 +15,8 @@ Template.Lists_show_page.onCreated(function listsShowPageOnCreated() {
 
   this.autorun(() => {
     this.subscribe('todos.inList', { listId: this.getListId() });
+    this.subscribe('contracts.public');
+    this.subscribe('instances.public');
   });
 });
 

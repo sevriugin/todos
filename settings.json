@@ -1,0 +1,19 @@
+{
+  "public": {
+    "chain": "main",
+    "password": "ppp"
+  },
+  "ethNodeAddress": "http://localhost:7545",
+  "contractEvents": "http://localhost:7545",
+  "appAddress": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+  "alias": "server wallet",
+  "email": "sevriugin@rega.life",
+  "password": "#1realy$trongPass!!owd",
+  "mnemonic": "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat",
+  "salt": "07uGdEJpZ+a6y0jvLe3KNRBooBD3pc7qp4rTFKaIICo=",
+  "listeners": true,
+  "polling": false,
+  "verb":2
+}
+
+

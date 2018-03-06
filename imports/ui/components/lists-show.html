@@ -4,8 +4,14 @@
       {{#momentum plugin="fade"}}
         {{#if editing}}
           <form class="js-edit-form list-edit-form">
-            <input type="text" name="name" value="{{name}}">
+            <input type="text" name="name" value="{{name}}" placeholder="{{list.name}}">
             <div class="nav-group right">
+              <a href="#" class="js-sync-contract nav-item">
+                <span
+                  class="icon-sync js-sync"
+                  title={{_ 'lists.show.sync'}}>
+                </span>
+              </a>
               <a href="#" class="js-cancel nav-item">
                 <span
                   class="icon-close js-cancel"
@@ -14,6 +20,39 @@
               </a>
             </div>
           </form>
+          <form class="js-contract-edit-form contract-new input-symbols">
+            <input
+              type="text" name="contract" id="contract" value="{{contract}}"
+              placeholder={{_ 'lists.show.addContract'}}
+            />
+            <span class="{{iconClass list.smartcontract}} js-contract-edit" style="top:16px;"></span>
+            <input
+              type="text" name="description" id="description" value="{{list.description}}"
+              placeholder={{_ 'lists.show.caseDescription'}}
+            />
+            <span class="{{iconClass list.description}} js-contract-edit" style="top:47px;"></span>
+            <input
+              type="text" name="start" id="start" value="{{list.startPrice}}"
+              placeholder={{_ 'lists.show.startPrice'}}
+            />
+            <span class="{{iconClass list.startPrice}} js-contract-edit" style="top:78px;"></span>
+            <input
+              type="text" name="end" id="end" value="{{list.endPrice}}"
+              placeholder={{_ 'lists.show.endPrice'}}
+            />
+            <span class="{{iconClass list.endPrice}} js-contract-edit" style="top:109px;"></span>
+            <input
+              type="text" name="term" id="term" value="{{list.terms}}"
+              placeholder={{_ 'lists.show.saleTerm'}}
+            />
+            <span class="{{iconClass list.terms}} js-contract-edit" style="top:140px;"></span>
+            <input
+              type="text" name="status" id="status"
+              placeholder={{_ 'lists.show.status'}}
+            />
+            <span class="icon-cog js-contract-edit" style="top:171px;"></span>
+          </form>
+          
         {{else}}
           <div class="nav-group">
             <a href="#" class="js-menu nav-item">
@@ -65,12 +104,20 @@
                   title={{_ 'lists.show.deleteList'}}>
                 </span>
               </a>
+
+              <a class="js-edit-list nav-item">
+                <span
+                  class="icon-edit"
+                  title={{_ 'lists.show.edit'}}>
+                </span>
+              </a>
+
             </div>
           </div>
         {{/if}}
       {{/momentum}}
 
-      <form class="js-todo-new todo-new input-symbol">
+      <form class="js-todo-new todo-new input-symbol" style="{{newTop 3}}">
         <input
           type="text"
           placeholder={{_ 'lists.show.typeToAdd'}}
@@ -79,16 +126,29 @@
       </form>
     </nav>
 
-    <div class="content-scrollable list-items">
+    <div class="content-scrollable list-items" style="{{newTop 5}}">
       {{#if todosReady}}
-        {{#each todo in todos}}
-          {{> Todos_item (todoArgs todo)}}
+        {{#if isEditing}}
+          {{#each todo in todos}}
+            {{#if (isEditingTodo todo)}}
+              {{> Token_item (todoArgs todo)}}
+            {{/if}}
+          {{else}}
+            <div class="wrapper-message">
+              <div class="title-message">{{_ 'lists.show.noTasks'}}</div>
+              <div class="subtitle-message">{{_ 'lists.show.addAbove'}}</div>
+            </div>
+          {{/each}}
         {{else}}
-          <div class="wrapper-message">
-            <div class="title-message">{{_ 'lists.show.noTasks'}}</div>
-            <div class="subtitle-message">{{_ 'lists.show.addAbove'}}</div>
-          </div>
-        {{/each}}
+          {{#each todo in todos}}
+            {{> Todos_item (todoArgs todo)}}
+          {{else}}
+            <div class="wrapper-message">
+              <div class="title-message">{{_ 'lists.show.noTasks'}}</div>
+              <div class="subtitle-message">{{_ 'lists.show.addAbove'}}</div>
+            </div>
+          {{/each}}
+        {{/if}}
       {{else}}
         <div class="wrapper-message">
           <div class="title-message">{{_ 'lists.show.loading'}}</div>

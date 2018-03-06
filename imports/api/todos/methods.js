@@ -6,6 +6,7 @@ import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 
 import { Todos } from './todos.js';
 import { Lists } from '../lists/lists.js';
+import { Contracts } from '../contracts/contracts.js';
 
 export const insert = new ValidatedMethod({
   name: 'todos.insert',
@@ -78,6 +79,38 @@ export const updateText = new ValidatedMethod({
   },
 });
 
+export const updateContract = new ValidatedMethod({
+  name: 'todos.updateContract',
+  validate: new SimpleSchema({
+    todoId: Todos.simpleSchema().schema('_id'),
+    smartcontract: { type: String, optional: true },
+    balance: Todos.simpleSchema().schema('balance'),
+  }).validator({ clean: true, filter: false }),
+  run({ todoId, smartcontract, balance }) {
+    // This is complex auth stuff - perhaps denormalizing a userId onto todos
+    // would be correct here?
+    const todo = Todos.findOne(todoId);
+    const sc = Contracts.findOne({ name: smartcontract });
+
+    if (!todo.editableBy(this.userId)) {
+      throw new Meteor.Error('todos.updateText.accessDenied',
+        'Cannot edit todos in a private list that is not yours');
+    }
+
+    if (!sc && smartcontract) {
+      throw new Meteor.Error('todos.updateText.accessDenied',
+        `Cannot find contract name: ${smartcontract}`);
+    }
+
+    Todos.update(todoId, {
+      $set: {
+        smartcontract: (_.isUndefined(smartcontract) ? null : sc._id),
+        balance: (_.isUndefined(balance) ? null : balance),
+      },
+    });
+  },
+});
+
 export const remove = new ValidatedMethod({
   name: 'todos.remove',
   validate: new SimpleSchema({
@@ -101,6 +134,7 @@ const TODOS_METHODS = _.pluck([
   setCheckedStatus,
   updateText,
   remove,
+  updateContract,
 ], 'name');
 
 if (Meteor.isServer) {
