@@ -11,7 +11,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.40",
+    "@babel/runtime": "^7.0.0-beta.42",
     "ajv": "^6.2.1",
     "autoprefixer": "^6.4.1",
     "babel-runtime": "^6.26.0",
@@ -23,7 +23,8 @@
     "meteor-node-stubs": "^0.3.2",
     "solc": "^0.4.20",
     "truffle-contract": "^3.0.4",
-    "web3": "^0.20.1"
+    "web3": "^0.20.1",
+    "web3-provider-engine": "^13.6.5"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",

@@ -29,7 +29,8 @@ import {
 } from '../../api/todos/methods.js';
 
 import {
-  cryptocaseStatus,
+  cryptocaseCreate,
+  cryptocaseOrder,
 } from '../../api/instances/methods.js';
 
 import { displayError } from '../lib/errors.js';
@@ -230,27 +231,16 @@ Template.Lists_show.events({
       const method = $input.attr('id');
       if (method === 'status') {
         const list = instance.data.list();
-        smartcontract(list.contract())
-          .then((sc) => {
-            sc.state.call()
-          .then((state) => {
-            console.log(`Status is ----> ${state}`);
-            $input.val(`Status is ${state}`);
-
-            cryptocaseStatus.call({
-              instanceId: list.contractInstance(),
-            }, displayError);
-            getAccounts()
-              .then((accounts) => {
-                console.log(`account --->${accounts[0]}`);
-                getBalance(accounts[0]).then((balance) => { console.log(`balance --->${balance}`); });
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          });
-          }).catch((error) => {
-            console.log(error.message);
+        cryptocaseCreate.call({
+          instanceId: list.contractInstance(),
+        }, displayError);
+        getAccounts()
+          .then((accounts) => {
+            console.log(`account --->${accounts[0]}`);
+            getBalance(accounts[0]).then((balance) => { console.log(`balance --->${balance}`); });
+          })
+          .catch((err) => {
+            console.log(err);
           });
       }
     } else {

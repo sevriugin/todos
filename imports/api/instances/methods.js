@@ -5,7 +5,7 @@ import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 
 import { Instances } from './instances.js';
-import { smartcontract, getNetwork } from '../../ethereum/ethereum-contracts.js';
+import { smartcontract, getNetwork, getAccounts, getWeb3 } from '../../ethereum/ethereum-contracts.js';
 import { Contracts } from '../contracts/contracts.js';
 import { logger } from '../../utils/logger.js';
 
@@ -34,39 +34,71 @@ export const remove = new ValidatedMethod({
   },
 });
 
-export const cryptocaseStatus = new ValidatedMethod({
-  name: 'instances.cryptocaseStatus',
+
+export const cryptocaseCreate = new ValidatedMethod({
+  name: 'instances.cryptocaseCreate',
   validate: new SimpleSchema({
     instanceId: Instances.simpleSchema().schema('_id'),
   }).validator({ clean: true, filter: false }),
   run({ instanceId }) {
     const instance = Instances.findOne(instanceId);
-    logger('cryptocaseStatus instance', instance);
-    getNetwork()
-      .then((id) => {
-        logger('cryptocaseStatus networkId', id);
-        const address = instance.networks[id].address;
-        logger('cryptocaseStatus address', address);
+    logger('cryptocaseCreate instance', instance);
+    getAccounts()
+      .then((accounts) => {
+        logger('cryptocaseCreate accounts', accounts);
+        const fromAccount = accounts[0];
+        logger('cryptocaseCreate from_account', fromAccount);
         const contract = Contracts.findOne(instance.contract);
-        logger('cryptocaseStatus contract.name', contract.name);
+        logger('cryptocaseCreate contract.name', contract.name);
         smartcontract(contract.name)
           .then((sc) => {
-            sc.state.call()
-              .then((state) => {
-                console.log(`cryptocaseStatus Status is ----> ${state}`);
+            sc.createCase('img', 100, { from: fromAccount })
+              .then((result) => {
+                console.log(`cryptocaseCreate newcase ID ----> ${JSON.stringify(result.logs)}`);
               });
           })
-          .catch((error) => { console.log(`cryptocaseStatus error-->${error}`); });
+          .catch((error) => { console.log(`cryptocaseCreate error-->${error}`); });
       })
-      .catch((err) => { console.log(`cryptocaseStatus error-->${err}`); });
+      .catch((err) => { console.log(`cryptocaseCreate error-->${err}`); });
   },
 });
+
+export const cryptocaseOrder = new ValidatedMethod({
+  name: 'instances.cryptocaseOrder',
+  validate: new SimpleSchema({
+    instanceId: Instances.simpleSchema().schema('_id'),
+  }).validator({ clean: true, filter: false }),
+  run({ instanceId }) {
+    const instance = Instances.findOne(instanceId);
+    logger('cryptocaseOrder instance', instance);
+    getAccounts()
+      .then((accounts) => {
+        logger('cryptocaseOrder accounts', accounts);
+        const fromAccount = accounts[0];
+        logger('cryptocaseOrder from_account', fromAccount);
+        const contract = Contracts.findOne(instance.contract);
+        logger('cryptocaseOrder contract.name', contract.name);
+        smartcontract(contract.name)
+          .then((sc) => {
+            const price = getWeb3().toWei(6, 'ether');
+            sc.Order({ value: price, from: fromAccount })
+              .then((result) => {
+                console.log(`cryptocaseOrder tnx ----> ${result.tnx}`);
+              });
+          })
+          .catch((error) => { console.log(`cryptocaseOrder error-->${error}`); });
+      })
+      .catch((err) => { console.log(`cryptocaseOrder error-->${err}`); });
+  },
+});
+
 
 // Get list of all method names on contracts
 const INSTANCES_METHODS = _.pluck([
   insert,
   remove,
-  cryptocaseStatus,
+  cryptocaseCreate,
+  cryptocaseOrder,
 ], 'name');
 
 if (Meteor.isServer) {
